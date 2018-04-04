@@ -1,0 +1,241 @@
+--Get all invoices where the UnitPrice on the InvoiceLine is greater than $0.99.
+/* select * 
+from Invoice i 
+join InvoiceLine il on il.invoiceId =i.invoiceId
+where il.UnitPrice >0.99; */
+--Get the InvoiceDate, customer FirstName and LastName, and Total from all invoices.
+/* select i.customerId ,i.InvoiceDate,c.Firstname ,c.LastName,i.Total
+from Invoice i 
+join Customer c on i.customerId = c.customerId; */
+--Get the customer FirstName and LastName and the support rep's FirstName and LastName from all customers.
+--Support reps are on the Employee table.
+/* select c.FirstName, c.LastName , e.firstName ,e.LastName
+from Customer c
+join Employee e on c.SupportRepId = e.EmployeeId; */
+--Get the album Title and the artist Name from all albums.
+/* select al.title ,ar.Name 
+from Album al
+join Artist ar on al.ArtistId = ar.ArtistId; */
+--Get all PlaylistTrack TrackIds where the playlist Name is Music.
+/* select plt.TrackId
+from PlaylistTrack plt
+join playlist p on p.PlaylistId = plt.Playlistid
+where p.Name ="Music" */
+--Get all Track Names for PlaylistId 5.
+/* select t.name, pt.playlistid
+from Track t
+join PlaylistTrack pt on pt.trackid = t.trackid
+where pt.PlaylistId =5; */
+--Get all Track Names and the playlist Name that they're on ( 2 joins ).
+/* select t.name ,p.name
+from Track t 
+join playlistTrack pt on t.trackid = pt.Trackid
+join playlist p on pt.playlistid = p.playlistid; */
+--Get all Track Names and Album Titles that are the genre "Alternative" ( 2 joins ).
+select t.name , al.title, g.name
+from Track t
+join Album al on t.AlbumId = al.AlbumId
+join Genre g on g.GenreId = t.GenreId
+where g.name ="Alternative"
+
+
+
+
+Practice nested query---------------------------------------------------------------------------------------
+--Get all invoices where the UnitPrice on the InvoiceLine is greater than $0.99.
+/* select *
+from Invoice 
+where InvoiceId in(select InvoiceId from InvoiceLine where UnitPrice>0.99) */
+--Get all Playlist Tracks where the playlist name is Music.
+/* select *
+from PlaylistTrack
+where  PlaylistId =(select PlaylistId from Playlist where Name="Music") */
+--Get all Track names for PlaylistId 5.
+/* select Name 
+from Track
+where TrackId=(select TrackId from PlaylistTrack where PlaylistId=5) */
+--Get all tracks where the Genre is Comedy.
+/* select * 
+from Track 
+where GenreId in (select GenreId from Genre where Name="Comedy"); */
+--Get all tracks where the Album is Fireball.
+/* select *
+from Track 
+where AlbumId  in(select AlbumId from Album where Title="Fireball"); */
+--Get all tracks for the artist Queen ( 2 nested subqueries ).
+/* select * 
+from Track 
+where AlbumId in (
+  select AlbumId from Album
+  where ArtistId in(
+    select ArtistId from Artist where Name="Queen"
+)) */
+
+
+practice updating Rows---------------------------------------------------------------------------------------------
+
+--Find all customers with fax numbers and set those numbers to null.
+/* update Customer
+set Fax =null
+where Fax is not null; */
+--select * from Customer
+--Find all customers with no company (null) and set their company to "Self".
+/* update Customer
+set Company ="Self"
+where Company is null; */
+--Find the customer Julia Barnett and change her last name to Thompson.
+/* update Customer
+set LastName ="Thompson"
+where FirstName="Julia" and LastName ="Barnett" */
+--Find the customer with this email luisrojas@yahoo.cl and change his support rep to 4.
+/* update Customer
+set SupportRepId =4
+where Email ="luisrojas@yahoo.cl"; */
+--Find all tracks that are the genre Metal and have no composer. Set the composer to "The darkness around us".
+update Track
+set Composer ="The darknesss around us"
+where GenreId =(select GenreId from Genre where Name ="Metal")
+And Composer Is null
+--Refresh your page to remove all database changes.
+
+
+group by ------------------------------------------------------------------------------------------------------------
+--Find a count of how many tracks there are per genre. Display the genre name with the count.
+/* select Count(*), g.Name
+from Track t
+join Genre g on t.GenreId = g.genreid
+group by g.name */
+--Find a count of how many tracks are the "Pop" genre and how many tracks are the "Rock" genre.
+/* select count(*),g.name
+from Track t
+join Genre g on g.Genreid = t.Genreid
+where g.name ="Pop" or g.name ="Rock"
+Group by g.Name */
+--Find a list of all artists and how many albums they have.
+select ar.Name, Count(*)
+from Artist ar
+join Album al on ar.artistid = al.artistid
+group by al.ArtistId;
+
+Use distinct------------------------------------------------------------------------------------------------------
+
+--From the Track table find a unique list of all Composers.
+/* select distinct Composer
+from Track; */
+--From the Invoice table find a unique list of all BillingPostalCodes.
+/* select distinct BillingPostalCode
+from Invoice; */
+--From the Customer table find a unique list of all Companys.
+select distinct Company
+from Customer;
+
+
+delete Rows-----------------------------------------------------------------------------------------------
+/* CREATE TABLE practice_delete ( Name string, Type string, Value integer );
+INSERT INTO practice_delete ( Name, Type, Value ) VALUES ("delete", "bronze", 50);
+INSERT INTO practice_delete ( Name, Type, Value ) VALUES ("delete", "bronze", 50);
+INSERT INTO practice_delete ( Name, Type, Value ) VALUES ("delete", "bronze", 50);
+INSERT INTO practice_delete ( Name, Type, Value ) VALUES ("delete", "silver", 100);
+INSERT INTO practice_delete ( Name, Type, Value ) VALUES ("delete", "silver", 100);
+INSERT INTO practice_delete ( Name, Type, Value ) VALUES ("delete", "gold", 150);
+INSERT INTO practice_delete ( Name, Type, Value ) VALUES ("delete", "gold", 150);
+INSERT INTO practice_delete ( Name, Type, Value ) VALUES ("delete", "gold", 150);
+INSERT INTO practice_delete ( Name, Type, Value ) VALUES ("delete", "gold", 150); */
+
+SELECT * FROM practice_delete;
+
+delete 
+from practice_delete
+where Value ="150";
+delete 
+from practice_delete
+where Type ="bronze";
+delete 
+from practice_delete
+where Type ="silver";
+
+
+
+
+Create 3 tables following the criteria in the summary.-------------------------------------------
+
+
+CREATE TABLE Users ( UserId integer Not null Primary key ,Name string, Email string);
+INSERT INTO Users ( Name, Email ) VALUES ("Hayden", "anhayzzing33@gmail.com");
+INSERT INTO Users ( Name, Email ) VALUES ("Talia", "Talia@hotmail.com");
+INSERT INTO Users ( Name, Email ) VALUES ("Jade", "Jade@hotmail.com");
+
+
+CREATE TABLE Products ( ProductId integer Not null Primary key, Name string, Price float,
+OrderId int,
+FOREIGN KEY (OrderId) REFERENCES Orders(OrderId));
+INSERT INTO Products ( Name, Price, OrderId ) VALUES ("milk", 12.00,1);
+INSERT INTO Products ( Name, Price ,OrderId) VALUES ("avocado", 20.00,1);
+INSERT INTO Products (Name, Price ,OrderId) VALUES ("apple", 15.00,2);
+
+CREATE TABLE Orders ( OrderId integer Not null Primary key, orderNumber integer not null);
+INSERT INTO Orders ( orderNumber) VALUES (1000);
+INSERT INTO Orders ( orderNumber) VALUES (2000);
+INSERT INTO Orders ( orderNumber) VALUES (3000);
+
+---------------------------------------------------------------------------------------------
+
+Run queries against your data.
+Get all products for the first order.-----------------------------------------------------
+
+select p.name, p.price
+from Orders o
+join Products p on o.orderid = p.orderid
+where p.orderid =1
+
+-------------------------------------------------------------------------------------------
+
+
+
+
+
+Get all orders-------------------------------------------------------------------------
+select * from Orders
+
+-------------------------------------------------------------------------------------------
+Get the total cost of an order ( sum the price of all products on an order ).----------------------------------
+
+
+select SUM(Price), o.orderid
+from Products pr
+join Orders o on pr.orderid = o.orderid
+Group By o.orderid
+
+------------------------------------------------------------------------------------------------------
+
+Add a foreign key reference from Orders to Users.
+Update the Orders table to link a user to each order.------------------------------------------------------
+
+
+CREATE TABLE Users ( UserId integer Not null Primary key ,Name string, Email string,OrderId int,
+FOREIGN KEY (OrderId) REFERENCES Orders(OrderId));
+INSERT INTO Users ( Name, Email,OrderId ) VALUES ("Hayden", "anhayzzing33@gmail.com",1);
+INSERT INTO Users ( Name, Email ,OrderId ) VALUES ("Talia", "Talia@hotmail.com",2);
+INSERT INTO Users ( Name, Email ,OrderId ) VALUES ("Jade", "Jade@hotmail.com",3);
+
+
+-----------------------------------------------------------------------------------------------------
+
+
+Run queries against your data.
+Get all orders for a user.------------------------------------------------------------------
+
+select u.name,orderid
+from Users u
+join Orders on o.orderid = u.orderid
+
+
+
+------------------------------------------------------------------------------------------
+Get how many orders each user has.
+
+select count(*), u.Name
+From Orders o 
+join Users u on o.orderid = u.orderid
+Group by u.Name
+
